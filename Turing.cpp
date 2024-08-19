@@ -61,7 +61,7 @@ public:
 
         cout << "Initial state: " << initial_state << endl;
 
-        cout << "Transitions: " << endl;
+        cout << "Transitions:\n";
         for (const auto &transition : transitions) {
             string state = get<0>(transition.first);
             char read_symbol = get<1>(transition.first);
@@ -71,12 +71,49 @@ public:
             cout << "(" << state << ", " << read_symbol << ") -> (" << next_state << ", " << write_symbol << ", " << action << ")\n";
         }
     }
+
+    void run_TM(string tape, int head_pos) {
+        string state = this->initial_state;
+        while (true) {
+            char tape_symbol = tape[head_pos];
+            if (this->transitions.find(make_tuple(state, tape_symbol)) == this->transitions.end()) {
+                cout << "Error: No transition found for state " + state + " and symbol " + tape_symbol << endl;
+                break;
+            }
+
+            tuple<string, char, char> transition = this->transitions[make_tuple(state, tape_symbol)];
+            string next_state = get<0>(transition);
+            char write_symbol = get<1>(transition);
+            char action = get<2>(transition);
+
+            tape[head_pos] = write_symbol;
+            if (action == 'L') {
+                head_pos--;
+            } else if (action == 'R') {
+                head_pos++;
+            } else if (action == 'Y') {
+                cout << "Accepted." << endl;
+                break;
+            } else if (action == 'N') {
+                cout << "Rejected." << endl;
+                break;
+            }
+
+            state = next_state;
+
+            cout << "Tape: " << tape << " (head at position " << head_pos << ")" << endl;
+        }
+    }
 };
 
 int main() {
     TuringMachine TM;
     TM.get_TM_specs_from_user();
     TM.print_TM_specs();
+
+    string tape = "101";
+    int head_pos = 0;
+    TM.run_TM(tape, head_pos);
 
     return 0;
 }
