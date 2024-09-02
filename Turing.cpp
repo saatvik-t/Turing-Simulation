@@ -9,6 +9,14 @@ private:
     set<char> tape_symbols;
     map<tuple<string, char>, tuple<string, char, char>> transitions;
 
+    bool check_valid_state(string state) {
+        return states.find(state) != states.end();
+    }
+
+    bool check_valid_symbol(char symbol) {
+        return tape_symbols.find(symbol) != tape_symbols.end();
+    }
+
 public:
     void get_TM_specs_from_user() {
         int n_states;
@@ -31,8 +39,13 @@ public:
             this->tape_symbols.insert(symbol);
         }
 
-        cout << "Enter initial state: ";
-        cin >> initial_state;
+        while (true) {
+            cout << "Enter initial state: ";
+            cin >> initial_state;
+            if (check_valid_state(initial_state))
+                break;
+            cout << "Error: Invalid state" << endl;
+        }
 
         int n_transitions;
         cout << "Enter number of transitions: ";
@@ -42,6 +55,11 @@ public:
             char read_symbol, write_symbol, action;
             cout << "Enter transition (state, read_symbol, next_state, write_symbol, action): ";
             cin >> state >> read_symbol >> next_state >> write_symbol >> action;
+            if (!check_valid_state(state) || !check_valid_state(next_state) || !check_valid_symbol(read_symbol) || !check_valid_symbol(write_symbol)) {
+                cout << "Error: Invalid state or symbol" << endl;
+                i--;
+                continue;
+            }
             transitions[make_tuple(state, read_symbol)] = make_tuple(next_state, write_symbol, action);
         }
     }
